@@ -1,4 +1,4 @@
-# File checked by linting
+# File checked by lintin
 from flask import Flask, render_template
 
 app = Flask(__name__)
