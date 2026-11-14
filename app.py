@@ -1,6 +1,5 @@
-#File checked by linting
+# File checked by linting
 from flask import Flask, render_template
-
 
 app = Flask(__name__)
 
