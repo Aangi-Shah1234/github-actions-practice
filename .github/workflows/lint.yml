@@ -1,14 +1,27 @@
+
 ## Whenever I change the code
 ## linter is used to check the python workflow that if its correct or not.
+
 name: Auto Linter
+
 on:
   push:
-    paths: "*.py"
+    paths:
+      - '**.py'
 
 jobs:
   code:
     runs-on: ubuntu-latest
+
     # this step will automatically clone the code to current branch into the runner
     steps:
       - name: Checkout/Clone the code
         uses: actions/checkout@v4
+
+      # It will install the linting tool
+      - name: Install Linter
+        run: pip install ruff
+
+      # It will check the Python code
+      - name: Run Linter
+        run: ruff check .
