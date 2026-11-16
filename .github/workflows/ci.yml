@@ -1,32 +1,47 @@
-
-# Goal: Build the image for DevBoard Frontend and Push to Docker Hub
-
-name: CI
+name: Python CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-push:
+  ci-cd:
+    name: Lint, Build, and Push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
+      - name: Checkout repository code
+        uses: actions/checkout@v4
 
-      - name: Check Docker Hub username
-        run: echo "Username is ${{ vars.DOCKERHUB_USERNAME }}"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Docker Setup [Login to Docker Hub]
-        uses: docker/login-action@v4
+      - name: Install dependencies and Ruff
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Run Ruff Linter
+        run: |
+          ruff check .
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v7
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          tags: aangishah3306/aangi-shah:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/python-cicd-app:latest

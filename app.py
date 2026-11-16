@@ -1,14 +1,17 @@
-# File checked by lintin
-from flask import Flask, render_template
+from flask import Flask
 
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello_world():
-    return render_template('index.html')
+@app.route("/")
+def home():
+    return "Welcome to my Python CI/CD project!"
 
 
-@app.route('/health')
+@app.route("/health")
 def health():
-    return 'Server is up and running'
+    return "Application is running successfully"
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

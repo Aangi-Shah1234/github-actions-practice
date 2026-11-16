@@ -1,0 +1,8 @@
+# Ruff linter configuration
+line-length = 88
+target-version = "py311"
+
+[lint]
+# Select standard pycodestyle (E, W) and Pyflakes (F) rules
+select = ["E", "F", "W"]
+ignore = []
