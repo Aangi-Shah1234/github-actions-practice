@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  # Uses the GitHub repository variable/secret, with fallback to your Docker Hub username
+  DOCKER_USER: ${{ vars.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME || 'aangishah3306' }}
+
 jobs:
   ci-cd:
     name: Lint, Build, and Push
@@ -29,19 +33,10 @@ jobs:
         run: |
           ruff check .
 
-      - name: Verify Docker Hub Username
-        run: |
-          USER="${{ vars.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME }}"
-          if [ -z "$USER" ]; then
-            echo "::error::DOCKERHUB_USERNAME is missing! Please configure it in your GitHub repository under Settings -> Secrets and variables -> Actions."
-            exit 1
-          fi
-          echo "Building for Docker Hub user: $USER"
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME }}
+          username: ${{ env.DOCKER_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Docker Buildx
@@ -53,4 +48,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME }}/python-cicd-app:latest
+          tags: ${{ env.DOCKER_USER }}/python-cicd-app:latest
