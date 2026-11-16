@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-env:
-  # Uses the GitHub repository variable/secret, with fallback to your Docker Hub username
-  DOCKER_USER: ${{ vars.DOCKERHUB_USERNAME || secrets.DOCKERHUB_USERNAME || 'aangishah3306' }}
-
 jobs:
   ci-cd:
     name: Lint, Build, and Push
@@ -32,6 +28,18 @@ jobs:
       - name: Run Ruff Linter
         run: |
           ruff check .
+
+      - name: Set Docker Hub Username
+        run: |
+          USER="${{ vars.DOCKERHUB_USERNAME }}"
+          if [ -z "$USER" ]; then
+            USER="${{ secrets.DOCKERHUB_USERNAME }}"
+          fi
+          if [ -z "$USER" ]; then
+            USER="aangishah3306"
+          fi
+          echo "DOCKER_USER=$USER" >> $GITHUB_ENV
+          echo "Successfully configured Docker Hub username: $USER"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
