@@ -7,11 +7,11 @@ on:
 
 jobs:
   ci-cd:
-    name: Lint, Build, and Push
+    name: Lint, Test, and Push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -19,17 +19,21 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies and Ruff
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff
+          pip install ruff pytest
 
-      - name: Run Ruff Linter
+      - name: Run Linter
         run: |
           ruff check .
 
-      - name: Log in to Docker Hub
+      - name: Run Tests
+        run: |
+          pytest test_app.py -v
+
+      - name: Docker Setup [Login]
         uses: docker/login-action@v3
         with:
           username: aangishah3306
@@ -38,7 +42,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
+      - name: Docker Build and Push
         uses: docker/build-push-action@v6
         with:
           context: .
